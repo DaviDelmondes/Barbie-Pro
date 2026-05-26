@@ -38,11 +38,12 @@ async function fetchServices(): Promise<Service[]> {
 async function fetchBarbers(): Promise<Profile[]> {
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, name, phone, avatar_url, specialty, role, created_at')
+    .select('*')
     .eq('role', 'barber')
     .order('name')
+  console.log('barbeiros:', data, 'erro:', error)
   if (error) throw error
-  return data
+  return data ?? []
 }
 
 async function fetchWorkdays(barberId: string): Promise<Set<number>> {
@@ -463,7 +464,25 @@ export default function PublicBooking() {
                 </div>
               )}
 
-              {barbersQ.data && (
+              {barbersQ.isError && (
+                <div className="rounded-xl border border-red-500/20 bg-red-500/8 p-4 text-center space-y-1">
+                  <p className="text-red-400 text-sm font-medium">Erro ao carregar profissionais</p>
+                  <p className="text-red-400/60 text-xs font-mono">
+                    {(barbersQ.error as Error)?.message ?? 'Verifique o console para detalhes'}
+                  </p>
+                </div>
+              )}
+
+              {barbersQ.data?.length === 0 && !barbersQ.isLoading && (
+                <div className="rounded-xl border border-white/8 bg-white/3 p-6 text-center space-y-1">
+                  <p className="text-zinc-400 text-sm">Nenhum barbeiro encontrado</p>
+                  <p className="text-zinc-600 text-xs">
+                    Verifique se a tabela profiles tem registros com role = 'barber' e se a RLS policy está configurada.
+                  </p>
+                </div>
+              )}
+
+              {barbersQ.data && barbersQ.data.length > 0 && (
                 <div className="space-y-3">
                   {barbersQ.data.map(b => (
                     <button
