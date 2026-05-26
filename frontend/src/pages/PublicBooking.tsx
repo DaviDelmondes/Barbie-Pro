@@ -220,6 +220,14 @@ type Step = 1 | 2 | 3 | 4
 export default function PublicBooking() {
   const navigate = useNavigate()
 
+  // Swap manifest so "Add to Home Screen" from /agendar opens on /agendar
+  useEffect(() => {
+    const link = document.querySelector<HTMLLinkElement>('link[rel="manifest"]')
+    const prev = link?.getAttribute('href') ?? '/manifest.json'
+    if (link) link.setAttribute('href', '/manifest-cliente.json')
+    return () => { if (link) link.setAttribute('href', prev) }
+  }, [])
+
   const [step, setStep] = useState<Step>(1)
   const [success, setSuccess] = useState(false)
 

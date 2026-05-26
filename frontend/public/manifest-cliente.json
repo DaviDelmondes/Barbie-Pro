@@ -1,11 +1,11 @@
 {
-  "name": "Barbie Pro",
-  "short_name": "Barbie Pro",
-  "description": "Sistema de agendamento para barbearia",
+  "name": "Barbie Pro - Agendamento",
+  "short_name": "Agendar",
+  "description": "Agende seu horário na Barbie Pro",
   "theme_color": "#0a0a0a",
-  "background_color": "#0a0a0a",
+  "background_color": "#080808",
   "display": "standalone",
-  "start_url": "/admin",
+  "start_url": "/agendar",
   "scope": "/",
   "orientation": "portrait",
   "icons": [
