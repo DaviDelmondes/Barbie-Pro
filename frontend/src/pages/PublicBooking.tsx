@@ -261,6 +261,7 @@ export default function PublicBooking() {
       if (error) throw error
     },
     onSuccess: () => setSuccess(true),
+    onError: (err) => console.error('Erro ao confirmar agendamento:', err),
   })
 
   // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -562,6 +563,12 @@ export default function PublicBooking() {
                   />
                 </div>
               </div>
+
+              {confirmMut.isError && (
+                <div className="mb-4 p-3 rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 text-sm text-center">
+                  Erro ao confirmar: {(confirmMut.error as Error)?.message ?? 'Tente novamente.'}
+                </div>
+              )}
 
               <button
                 onClick={() => confirmMut.mutate()}
