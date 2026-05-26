@@ -80,6 +80,7 @@ export default function Booking() {
       if (error) throw error
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-appointments'] }),
+    onError: (err) => console.error('Erro ao atualizar status:', err),
   })
 
   const visible = (data ?? []).filter(a => filter === 'all' || a.status === filter)
@@ -113,6 +114,13 @@ export default function Booking() {
           </button>
         ))}
       </div>
+
+      {/* Erro de atualização */}
+      {updateStatus.isError && (
+        <div className="mb-4 p-3 rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 text-sm">
+          Erro ao atualizar: {(updateStatus.error as Error)?.message ?? 'Verifique o console e a policy de UPDATE no Supabase.'}
+        </div>
+      )}
 
       {/* Loading */}
       {isLoading && (

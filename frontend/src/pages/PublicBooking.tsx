@@ -249,11 +249,12 @@ export default function PublicBooking() {
   const confirmMut = useMutation({
     mutationFn: async () => {
       if (!service || !barber || !date || !time) throw new Error('Dados incompletos')
-      const dayStr = date.toISOString().slice(0, 10)
+      const [h, m] = time.split(':').map(Number)
+      const scheduledAt = new Date(date.getFullYear(), date.getMonth(), date.getDate(), h, m, 0)
       const { error } = await supabase.from('appointments').insert({
         service_id: service.id,
         barber_id: barber.id,
-        scheduled_at: `${dayStr}T${time}:00`,
+        scheduled_at: scheduledAt.toISOString(),
         client_name: clientName.trim(),
         client_phone: clientPhone.trim(),
         status: 'pending',
