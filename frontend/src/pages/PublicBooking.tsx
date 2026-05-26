@@ -60,84 +60,98 @@ function MonthCalendar({
   selected: Date | null
   onSelect: (d: Date) => void
 }) {
-  const todayRef = new Date()
-  todayRef.setHours(0, 0, 0, 0)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
 
-  const [view, setView] = useState(() => {
-    const d = new Date()
-    d.setDate(1)
-    d.setHours(0, 0, 0, 0)
-    return d
-  })
+  const [viewYear, setViewYear] = useState(today.getFullYear())
+  const [viewMonth, setViewMonth] = useState(today.getMonth())
 
-  const year = view.getFullYear()
-  const month = view.getMonth()
-  const firstWd = new Date(year, month, 1).getDay()
-  const daysInMonth = new Date(year, month + 1, 0).getDate()
+  const firstDayOfWeek = new Date(viewYear, viewMonth, 1).getDay()
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate()
 
-  const cells: (Date | null)[] = []
-  for (let i = 0; i < firstWd; i++) cells.push(null)
-  for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(year, month, d))
+  const cells: (number | null)[] = []
+  for (let i = 0; i < firstDayOfWeek; i++) cells.push(null)
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d)
 
-  const isCurrentMonth =
-    year === todayRef.getFullYear() && month === todayRef.getMonth()
+  const isCurrentMonth = viewYear === today.getFullYear() && viewMonth === today.getMonth()
+
+  function goToPrevMonth() {
+    if (isCurrentMonth) return
+    if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1) }
+    else setViewMonth(m => m - 1)
+  }
+
+  function goToNextMonth() {
+    if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1) }
+    else setViewMonth(m => m + 1)
+  }
 
   return (
     <div>
       {/* Month nav */}
-      <div className="flex items-center justify-between mb-4">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
         <button
-          onClick={() => setView(new Date(year, month - 1, 1))}
+          onClick={goToPrevMonth}
           disabled={isCurrentMonth}
-          className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/5 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+          style={{ padding: 8, background: 'none', border: 'none', cursor: isCurrentMonth ? 'not-allowed' : 'pointer', opacity: isCurrentMonth ? 0.25 : 1, color: '#a1a1aa' }}
         >
-          <ChevronLeft className="w-4 h-4" />
+          <ChevronLeft size={16} />
         </button>
-        <span className="text-white font-semibold text-sm">
-          {MONTHS_PT[month]} {year}
+        <span style={{ color: 'white', fontWeight: 600, fontSize: 14 }}>
+          {MONTHS_PT[viewMonth]} {viewYear}
         </span>
         <button
-          onClick={() => setView(new Date(year, month + 1, 1))}
-          className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+          onClick={goToNextMonth}
+          style={{ padding: 8, background: 'none', border: 'none', cursor: 'pointer', color: '#a1a1aa' }}
         >
-          <ChevronRight className="w-4 h-4" />
+          <ChevronRight size={16} />
         </button>
       </div>
 
       {/* Day-of-week headers */}
-      <div className="grid grid-cols-7 mb-1">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', marginBottom: 4 }}>
         {DAYS_LETTER.map((d, i) => (
-          <div key={i} className="text-center text-xs font-medium text-zinc-600 py-1">{d}</div>
+          <div key={i} style={{ textAlign: 'center', fontSize: 11, color: '#52525b', padding: '4px 0' }}>{d}</div>
         ))}
       </div>
 
       {/* Day cells */}
-      <div className="grid grid-cols-7 gap-0.5">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2 }}>
         {cells.map((day, i) => {
-          if (!day) return <div key={i} />
+          if (day === null) return <div key={i} />
 
-          const isPast = day < todayRef
-          const disabled = isPast
-          const isSelected = selected?.toDateString() === day.toDateString()
-          const isToday = day.toDateString() === todayRef.toDateString()
+          const dayDate = new Date(viewYear, viewMonth, day)
+          const past = dayDate < today
+          const sel = selected !== null &&
+            selected.getFullYear() === viewYear &&
+            selected.getMonth() === viewMonth &&
+            selected.getDate() === day
+          const tod = viewYear === today.getFullYear() &&
+            viewMonth === today.getMonth() &&
+            day === today.getDate()
 
           return (
             <button
               key={i}
-              disabled={disabled}
-              onClick={() => onSelect(new Date(day))}
-              className={cn(
-                'aspect-square rounded-full flex items-center justify-center text-sm font-medium transition-all',
-                isSelected
-                  ? 'bg-amber-500 text-zinc-950 shadow-lg shadow-amber-500/30'
-                  : disabled
-                  ? 'opacity-30 cursor-not-allowed text-zinc-400'
-                  : isToday
-                  ? 'cursor-pointer border border-amber-500/60 text-amber-400 hover:bg-amber-500/10'
-                  : 'cursor-pointer text-zinc-200 hover:bg-white/8',
-              )}
+              onClick={() => onSelect(new Date(viewYear, viewMonth, day))}
+              disabled={past}
+              style={{
+                aspectRatio: '1 / 1',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 14,
+                fontWeight: 500,
+                cursor: past ? 'not-allowed' : 'pointer',
+                opacity: past ? 0.3 : 1,
+                backgroundColor: sel ? '#F59E0B' : 'transparent',
+                color: sel ? '#0a0a0a' : tod ? '#F59E0B' : '#e4e4e7',
+                border: tod && !sel ? '1px solid rgba(245,158,11,0.6)' : '1px solid transparent',
+                transition: 'background-color 0.15s, color 0.15s',
+              }}
             >
-              {day.getDate()}
+              {day}
             </button>
           )
         })}
@@ -469,17 +483,22 @@ export default function PublicBooking() {
                     Horários — {formatDate(date)}
                   </p>
 
-                  <div className="grid grid-cols-3 gap-2">
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
                     {FIXED_SLOTS.map(slot => (
                       <button
                         key={slot}
                         onClick={() => setTime(slot)}
-                        className={cn(
-                          'py-3.5 rounded-xl border text-sm font-semibold transition-all active:scale-95',
-                          time === slot
-                            ? 'bg-amber-500 border-amber-500 text-zinc-950 shadow-lg shadow-amber-500/30'
-                            : 'border-white/10 bg-white/3 text-zinc-200 hover:border-amber-500/40 hover:bg-amber-500/5',
-                        )}
+                        style={{
+                          padding: '14px 0',
+                          borderRadius: 12,
+                          border: time === slot ? '1px solid #F59E0B' : '1px solid rgba(255,255,255,0.1)',
+                          backgroundColor: time === slot ? '#F59E0B' : 'rgba(255,255,255,0.03)',
+                          color: time === slot ? '#0a0a0a' : '#e4e4e7',
+                          fontSize: 14,
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          transition: 'background-color 0.15s',
+                        }}
                       >
                         {slot}
                       </button>
