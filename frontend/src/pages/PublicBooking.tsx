@@ -19,6 +19,11 @@ const MONTHS_SHORT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'S
 const DAYS_FULL = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']
 const DAYS_LETTER = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S']
 
+const FIXED_SLOTS = [
+  '09:00', '09:30', '10:00', '10:30', '11:00',
+  '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00',
+]
+
 function formatDate(d: Date) {
   return `${DAYS_FULL[d.getDay()]}, ${d.getDate()} de ${MONTHS_SHORT[d.getMonth()]}`
 }
@@ -46,67 +51,12 @@ async function fetchBarbers(): Promise<Profile[]> {
   return data ?? []
 }
 
-async function fetchWorkdays(barberId: string): Promise<Set<number>> {
-  const { data, error } = await supabase
-    .from('barber_schedules')
-    .select('weekday')
-    .eq('barber_id', barberId)
-  if (error) throw error
-  return new Set((data ?? []).map((s: { weekday: number }) => s.weekday))
-}
-
-async function fetchSlots(
-  barberId: string,
-  date: Date,
-  durationMin: number,
-): Promise<{ time: string; available: boolean }[]> {
-  const weekday = date.getDay()
-  const dayStr = date.toISOString().slice(0, 10)
-
-  const [{ data: schedules, error: schedErr }, { data: booked }] = await Promise.all([
-    supabase
-      .from('barber_schedules')
-      .select('start_time, end_time')
-      .eq('barber_id', barberId)
-      .eq('weekday', weekday),
-    supabase
-      .from('appointments')
-      .select('scheduled_at')
-      .eq('barber_id', barberId)
-      .gte('scheduled_at', `${dayStr}T00:00:00`)
-      .lte('scheduled_at', `${dayStr}T23:59:59`)
-      .in('status', ['pending', 'confirmed']),
-  ])
-
-  if (schedErr) throw schedErr
-  if (!schedules?.length) return []
-
-  const schedule = schedules[0] as { start_time: string; end_time: string }
-  const occupied = new Set(
-    (booked ?? []).map((a: { scheduled_at: string }) => a.scheduled_at.slice(11, 16)),
-  )
-
-  const [sh, sm] = schedule.start_time.split(':').map(Number)
-  const [eh, em] = schedule.end_time.split(':').map(Number)
-  const start = sh * 60 + sm
-  const end = eh * 60 + em - durationMin
-
-  const slots: { time: string; available: boolean }[] = []
-  for (let t = start; t <= end; t += 30) {
-    const time = `${Math.floor(t / 60).toString().padStart(2, '0')}:${(t % 60).toString().padStart(2, '0')}`
-    slots.push({ time, available: !occupied.has(time) })
-  }
-  return slots
-}
-
 // ── MonthCalendar ─────────────────────────────────────────────────────────────
 
 function MonthCalendar({
-  workdays,
   selected,
   onSelect,
 }: {
-  workdays: Set<number>
   selected: Date | null
   onSelect: (d: Date) => void
 }) {
@@ -167,8 +117,7 @@ function MonthCalendar({
           if (!day) return <div key={i} />
 
           const isPast = day < todayRef
-          const worksThisDay = workdays.has(day.getDay())
-          const disabled = isPast || !worksThisDay
+          const disabled = isPast
           const isSelected = selected?.toDateString() === day.toDateString()
           const isToday = day.toDateString() === todayRef.toDateString()
 
@@ -182,10 +131,10 @@ function MonthCalendar({
                 isSelected
                   ? 'bg-amber-500 text-zinc-950 shadow-lg shadow-amber-500/30'
                   : disabled
-                  ? 'text-zinc-700 cursor-not-allowed'
+                  ? 'opacity-30 cursor-not-allowed text-zinc-400'
                   : isToday
-                  ? 'border border-amber-500/60 text-amber-400 hover:bg-amber-500/10'
-                  : 'text-zinc-200 hover:bg-white/8',
+                  ? 'cursor-pointer border border-amber-500/60 text-amber-400 hover:bg-amber-500/10'
+                  : 'cursor-pointer text-zinc-200 hover:bg-white/8',
               )}
             >
               {day.getDate()}
@@ -249,14 +198,6 @@ function Skeleton({ className }: { className?: string }) {
   return <div className={cn('rounded-xl bg-white/4 border border-white/6 animate-pulse', className)} />
 }
 
-function Spinner() {
-  return (
-    <div className="flex justify-center py-10">
-      <div className="w-7 h-7 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
-    </div>
-  )
-}
-
 // ── Main component ────────────────────────────────────────────────────────────
 
 type Step = 1 | 2 | 3 | 4
@@ -287,19 +228,6 @@ export default function PublicBooking() {
     queryFn: fetchBarbers,
     enabled: step >= 2,
     staleTime: 5 * 60 * 1000,
-  })
-
-  const workdaysQ = useQuery({
-    queryKey: ['pub-workdays', barber?.id],
-    queryFn: () => fetchWorkdays(barber!.id),
-    enabled: !!barber && step >= 3,
-    staleTime: 5 * 60 * 1000,
-  })
-
-  const slotsQ = useQuery({
-    queryKey: ['pub-slots', barber?.id, date?.toISOString().slice(0, 10)],
-    queryFn: () => fetchSlots(barber!.id, date!, service!.duration_min),
-    enabled: !!barber && !!date && !!service,
   })
 
   // ── Mutation ─────────────────────────────────────────────────────────────────
@@ -529,13 +457,10 @@ export default function PublicBooking() {
                 className="border border-white/8 rounded-2xl p-4 mb-5"
                 style={{ background: 'rgba(255,255,255,0.03)' }}
               >
-                {workdaysQ.isLoading ? <Spinner /> : (
-                  <MonthCalendar
-                    workdays={workdaysQ.data ?? new Set()}
-                    selected={date}
-                    onSelect={d => { setDate(d); setTime(null) }}
-                  />
-                )}
+                <MonthCalendar
+                  selected={date}
+                  onSelect={d => { setDate(d); setTime(null) }}
+                />
               </div>
 
               {date && (
@@ -544,31 +469,22 @@ export default function PublicBooking() {
                     Horários — {formatDate(date)}
                   </p>
 
-                  {slotsQ.isLoading ? <Spinner /> : !slotsQ.data?.length ? (
-                    <p className="text-zinc-600 text-sm text-center py-6">
-                      Nenhum horário disponível neste dia.
-                    </p>
-                  ) : (
-                    <div className="grid grid-cols-3 gap-2">
-                      {slotsQ.data.map(slot => (
-                        <button
-                          key={slot.time}
-                          disabled={!slot.available}
-                          onClick={() => setTime(slot.time)}
-                          className={cn(
-                            'py-3.5 rounded-xl border text-sm font-semibold transition-all',
-                            time === slot.time
-                              ? 'bg-amber-500 border-amber-500 text-zinc-950 shadow-lg shadow-amber-500/30'
-                              : slot.available
-                              ? 'border-white/10 bg-white/3 text-zinc-200 hover:border-amber-500/40 hover:bg-amber-500/5 active:scale-95'
-                              : 'border-white/5 bg-white/2 text-zinc-700 cursor-not-allowed line-through decoration-zinc-700',
-                          )}
-                        >
-                          {slot.time}
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                  <div className="grid grid-cols-3 gap-2">
+                    {FIXED_SLOTS.map(slot => (
+                      <button
+                        key={slot}
+                        onClick={() => setTime(slot)}
+                        className={cn(
+                          'py-3.5 rounded-xl border text-sm font-semibold transition-all active:scale-95',
+                          time === slot
+                            ? 'bg-amber-500 border-amber-500 text-zinc-950 shadow-lg shadow-amber-500/30'
+                            : 'border-white/10 bg-white/3 text-zinc-200 hover:border-amber-500/40 hover:bg-amber-500/5',
+                        )}
+                      >
+                        {slot}
+                      </button>
+                    ))}
+                  </div>
                 </>
               )}
             </div>
