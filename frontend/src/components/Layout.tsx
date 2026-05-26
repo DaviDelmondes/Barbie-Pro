@@ -5,6 +5,7 @@ import gsap from 'gsap'
 import { cn } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
+import barberPoleBg from '@/assets/barber-pole.jpeg'
 
 const nav = [
   { to: '/admin/agendamentos', icon: CalendarCheck, label: 'Agendamento' },
@@ -45,7 +46,7 @@ function NavItem({ to, icon: Icon, label, onNavigate }: {
         cn(
           'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
           isActive
-            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+            ? 'bg-white/10 text-white border border-white/20'
             : 'text-zinc-400 hover:text-white hover:bg-white/5 border border-transparent',
         )
       }
@@ -76,12 +77,25 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="relative min-h-screen text-white" style={{ background: '#0a0a0a' }}>
+    <div className="relative min-h-screen text-white" style={{ background: '#080808' }}>
+
+      {/* Barber-pole background */}
+      <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+        <div style={{
+          position: 'absolute',
+          inset: -16,
+          backgroundImage: `url(${barberPoleBg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: 0.04,
+          filter: 'blur(8px)',
+        }} />
+      </div>
 
       {/* Mobile top bar */}
       <div
         className="md:hidden fixed top-0 left-0 right-0 h-14 flex items-center justify-between px-4 border-b border-white/5"
-        style={{ zIndex: 20, background: 'rgba(10,10,10,0.95)', backdropFilter: 'blur(20px)' }}
+        style={{ zIndex: 20, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(20px)' }}
       >
         <button
           onClick={() => setIsOpen(true)}
@@ -92,8 +106,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </button>
 
         <button onClick={() => { navigate('/'); close() }} className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-md bg-amber-500 flex items-center justify-center shadow-md shadow-amber-500/30">
-            <Scissors className="w-4 h-4 text-zinc-950" />
+          <div className="w-7 h-7 rounded-md bg-white/10 flex items-center justify-center">
+            <Scissors className="w-4 h-4 text-white" />
           </div>
           <span className="font-bold text-white text-sm">Barbie Pro</span>
         </button>
@@ -117,7 +131,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           'fixed left-0 top-0 h-screen w-64 flex flex-col border-r border-white/5 transition-transform duration-300',
           isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         )}
-        style={{ zIndex: 30, background: 'rgba(10,10,10,0.92)', backdropFilter: 'blur(20px)' }}
+        style={{ zIndex: 30, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(20px)' }}
       >
         {/* Fechar (mobile) */}
         <button
@@ -133,8 +147,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           onClick={() => { navigate('/'); close() }}
           className="p-6 border-b border-white/5 flex items-center gap-3 hover:bg-white/3 transition-colors w-full text-left"
         >
-          <div className="w-9 h-9 rounded-lg bg-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/30 shrink-0">
-            <Scissors className="w-5 h-5 text-zinc-950" />
+          <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
+            <Scissors className="w-5 h-5 text-white" />
           </div>
           <div>
             <p className="font-bold text-white leading-none">Barbie Pro</p>
@@ -152,7 +166,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {/* Usuário + Logout */}
         <div className="p-4 border-t border-white/5">
           <div className="flex items-center gap-3 px-3 py-2">
-            <div className="w-8 h-8 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-xs font-bold text-amber-400 shrink-0">
+            <div className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-xs font-bold text-white shrink-0">
               {displayInitial}
             </div>
             <div className="flex-1 min-w-0">

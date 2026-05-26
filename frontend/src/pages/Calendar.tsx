@@ -167,7 +167,7 @@ export default function Calendar() {
                   <p className="text-xs text-zinc-500">{DAYS[d.getDay()]}</p>
                   <div className={cn(
                     'w-8 h-8 rounded-full flex items-center justify-center mx-auto mt-1 font-semibold text-sm',
-                    isToday ? 'bg-amber-500 text-zinc-950' : 'text-zinc-300',
+                    isToday ? 'bg-white text-zinc-950' : 'text-zinc-300',
                   )}>
                     {d.getDate()}
                   </div>

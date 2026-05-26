@@ -53,7 +53,7 @@ export default function Home() {
   return (
     <section
       ref={sectionRef}
-      style={{ height: '100vh', position: 'relative', overflow: 'hidden', background: '#0a0a0a' }}
+      style={{ height: '100vh', position: 'relative', overflow: 'hidden', background: '#080808' }}
     >
       {/* Three.js — PlaneGeometry + shader de profundidade + parallax mouse */}
       <HomeScene />
@@ -99,14 +99,13 @@ export default function Home() {
             width: 36,
             height: 36,
             borderRadius: 8,
-            background: '#F59E0B',
+            background: 'rgba(255,255,255,0.12)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 0 24px rgba(245,158,11,0.45)',
           }}
         >
-          <Scissors size={18} color="#0a0a0a" />
+          <Scissors size={18} color="#ffffff" />
         </div>
         <span style={{ color: '#fff', fontWeight: 700, fontSize: 16, letterSpacing: '-0.01em' }}>
           Barbie Pro
@@ -126,15 +125,14 @@ export default function Home() {
           zIndex: 2,
         }}
       >
-        {/* Linha âmbar */}
+        {/* Linha prata */}
         <div
           ref={lineRef}
           style={{
             width: 52,
             height: 2,
-            background: '#F59E0B',
+            background: '#C0C0C0',
             margin: '0 auto 22px',
-            boxShadow: '0 0 14px rgba(245,158,11,0.65)',
             transformOrigin: 'left center',
           }}
         />
@@ -174,7 +172,7 @@ export default function Home() {
             display: 'inline-flex',
             alignItems: 'center',
             padding: '13px 32px',
-            background: '#F59E0B',
+            background: '#FFFFFF',
             color: '#0a0a0a',
             fontWeight: 700,
             fontSize: 15,
@@ -182,19 +180,19 @@ export default function Home() {
             border: 'none',
             cursor: 'pointer',
             letterSpacing: '0.02em',
-            boxShadow: '0 0 55px rgba(245,158,11,0.4), 0 6px 24px rgba(0,0,0,0.5)',
+            boxShadow: '0 0 40px rgba(255,255,255,0.15), 0 6px 24px rgba(0,0,0,0.5)',
             opacity: 0,
             transition: 'transform 0.22s ease, box-shadow 0.22s ease',
           }}
           onMouseEnter={e => {
             const el = e.currentTarget
             el.style.transform = 'scale(1.05)'
-            el.style.boxShadow = '0 0 75px rgba(245,158,11,0.55), 0 6px 28px rgba(0,0,0,0.5)'
+            el.style.boxShadow = '0 0 60px rgba(255,255,255,0.25), 0 6px 28px rgba(0,0,0,0.5)'
           }}
           onMouseLeave={e => {
             const el = e.currentTarget
             el.style.transform = 'scale(1)'
-            el.style.boxShadow = '0 0 55px rgba(245,158,11,0.4), 0 6px 24px rgba(0,0,0,0.5)'
+            el.style.boxShadow = '0 0 40px rgba(255,255,255,0.15), 0 6px 24px rgba(0,0,0,0.5)'
           }}
         >
           Agendar Agora

@@ -9,7 +9,7 @@ const STATUS_LABEL: Record<string, string> = {
 const STATUS_COLOR: Record<string, string> = {
   done: 'bg-green-500/10 text-green-400 border-green-500/30',
   confirmed: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
-  pending: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
+  pending: 'bg-white/10 text-zinc-300 border-white/20',
   cancelled: 'bg-red-500/10 text-red-400 border-red-500/30',
 }
 
@@ -73,7 +73,7 @@ function ClientRow({ client }: { client: typeof clients[0] }) {
         </div>
         <div className="text-right shrink-0 mr-2 sm:mr-4">
           <p className="text-xs text-zinc-500">Total</p>
-          <p className="font-bold text-amber-400">R$ {total}</p>
+          <p className="font-bold text-zinc-300">R$ {total}</p>
         </div>
         <div className="text-right shrink-0 mr-2 hidden sm:block">
           <p className="text-xs text-zinc-500">Visitas</p>
@@ -123,7 +123,7 @@ export default function Clients() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Buscar cliente por nome ou telefone..."
-          className="w-full border border-white/8 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-amber-500/50 transition-colors"
+          className="w-full border border-white/8 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-white/30 transition-colors"
           style={{ background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(12px)' }}
         />
       </div>

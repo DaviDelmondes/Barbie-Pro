@@ -23,8 +23,8 @@ export default function Login() {
   // Já autenticado → vai direto para o painel
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0a0a0a' }}>
-        <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#080808' }}>
+        <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -58,15 +58,15 @@ export default function Login() {
     <div
       className="min-h-screen flex items-center justify-center px-4"
       style={{
-        background: '#0a0a0a',
-        backgroundImage: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(245,158,11,0.07) 0%, transparent 70%)',
+        background: '#080808',
+        backgroundImage: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(255,255,255,0.04) 0%, transparent 70%)',
       }}
     >
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-amber-500 flex items-center justify-center shadow-2xl shadow-amber-500/30 mb-4">
-            <Scissors className="w-7 h-7 text-zinc-950" />
+          <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center mb-4">
+            <Scissors className="w-7 h-7 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-white tracking-tight">Barbie Pro</h1>
           <p className="text-zinc-500 text-sm mt-1">Acesso ao painel administrativo</p>
@@ -88,7 +88,7 @@ export default function Login() {
                 <p className="text-zinc-500 text-xs">Verifique sua caixa de entrada e siga as instruções.</p>
                 <button
                   onClick={() => { setForgotMode(false); setResetSent(false) }}
-                  className="text-amber-400 text-sm hover:text-amber-300 transition-colors"
+                  className="text-zinc-400 text-sm hover:text-white transition-colors"
                 >
                   Voltar ao login
                 </button>
@@ -108,7 +108,7 @@ export default function Login() {
                       placeholder="seu@email.com"
                       required
                       autoComplete="email"
-                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-white/10 bg-white/3 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-amber-500/60 focus:bg-white/5 transition-colors"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-white/10 bg-white/3 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-white/50 focus:bg-white/5 transition-colors"
                     />
                   </div>
                 </div>
@@ -119,7 +119,7 @@ export default function Login() {
                     'w-full py-3 rounded-xl font-bold text-sm transition-all mt-2',
                     resetLoading || !resetEmail
                       ? 'bg-white/5 text-zinc-600 cursor-not-allowed'
-                      : 'bg-amber-500 text-zinc-950 hover:bg-amber-400 shadow-lg shadow-amber-500/25 active:scale-[0.98]',
+                      : 'bg-white text-zinc-950 hover:bg-zinc-100 shadow-lg shadow-white/15 active:scale-[0.98]',
                   )}
                 >
                   {resetLoading ? 'Enviando...' : 'Enviar link'}
@@ -148,7 +148,7 @@ export default function Login() {
                     placeholder="seu@email.com"
                     required
                     autoComplete="email"
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-white/10 bg-white/3 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-amber-500/60 focus:bg-white/5 transition-colors"
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-white/10 bg-white/3 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-white/50 focus:bg-white/5 transition-colors"
                   />
                 </div>
               </div>
@@ -165,7 +165,7 @@ export default function Login() {
                     placeholder="••••••••"
                     required
                     autoComplete="current-password"
-                    className="w-full pl-10 pr-11 py-3 rounded-xl border border-white/10 bg-white/3 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-amber-500/60 focus:bg-white/5 transition-colors"
+                    className="w-full pl-10 pr-11 py-3 rounded-xl border border-white/10 bg-white/3 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-white/50 focus:bg-white/5 transition-colors"
                   />
                   <button
                     type="button"
@@ -193,7 +193,7 @@ export default function Login() {
                   'w-full py-3 rounded-xl font-bold text-sm transition-all mt-2',
                   submitting || !email || !password
                     ? 'bg-white/5 text-zinc-600 cursor-not-allowed'
-                    : 'bg-amber-500 text-zinc-950 hover:bg-amber-400 shadow-lg shadow-amber-500/25 active:scale-[0.98]',
+                    : 'bg-white text-zinc-950 hover:bg-zinc-100 shadow-lg shadow-white/15 active:scale-[0.98]',
                 )}
               >
                 {submitting ? 'Entrando...' : 'Entrar'}

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
-import barbershopBg from '@/assets/barbershop.jpeg'
+import gsap from 'gsap'
+import barberPoleBg from '@/assets/barber-pole.jpeg'
 
 export default function HomeScene() {
   const mountRef = useRef<HTMLDivElement>(null)
@@ -15,48 +16,43 @@ export default function HomeScene() {
     const renderer = new THREE.WebGLRenderer({ antialias: true })
     renderer.setSize(w, h)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-    renderer.setClearColor(0x0a0a0a)
+    renderer.setClearColor(0x080808)
     mount.appendChild(renderer.domElement)
 
-    // ── Câmera ────────────────────────────────────────────────────
+    // ── Câmera — começa em z=2.5, GSAP anima até z=1.8 ──────────
     const fov = 60
     const camera = new THREE.PerspectiveCamera(fov, aspect, 0.1, 100)
-    camera.position.z = 2
+    camera.position.z = 2.5
 
-    // ── Plano: tamanho baseado no que a câmera vê em z=0 ─────────
-    // Altura visível = 2 * tan(fov/2) * distância
-    const dist = 2
+    // ── Plano dimensionado para cobrir a tela no pior caso (z=2.5)
+    const dist = 2.5
     const visH = 2 * Math.tan((fov * Math.PI / 180) / 2) * dist
     const visW = visH * aspect
-    // 25% extra para o parallax não mostrar borda
-    const planeW = visW * 1.25
-    const planeH = visH * 1.25
+    const planeW = visW * 1.35
+    const planeH = visH * 1.35
 
     // ── Cena ──────────────────────────────────────────────────────
     const scene = new THREE.Scene()
 
-    // ── Textura ───────────────────────────────────────────────────
+    // ── Textura barber-pole ───────────────────────────────────────
     const texture = new THREE.Texture()
     texture.minFilter = THREE.LinearFilter
     texture.magFilter = THREE.LinearFilter
 
     const loader = new THREE.TextureLoader()
-    loader.load(barbershopBg, (tex) => {
+    loader.load(barberPoleBg, (tex) => {
       tex.minFilter = THREE.LinearFilter
       tex.magFilter = THREE.LinearFilter
       tex.colorSpace = THREE.SRGBColorSpace
 
-      // Cover: ajusta repeat/offset para não distorcer a foto
       const imgAspect = tex.image.width / tex.image.height
       const vpAspect = window.innerWidth / window.innerHeight
 
       if (vpAspect > imgAspect) {
-        // viewport mais largo que a imagem → recorta altura
         const scale = vpAspect / imgAspect
         tex.repeat.set(1, 1 / scale)
         tex.offset.set(0, (1 - 1 / scale) / 2)
       } else {
-        // viewport mais alto que a imagem → recorta largura
         const scale = imgAspect / vpAspect
         tex.repeat.set(1 / scale, 1)
         tex.offset.set((1 - 1 / scale) / 2, 0)
@@ -72,7 +68,7 @@ export default function HomeScene() {
     const plane = new THREE.Mesh(planeGeo, planeMat)
     scene.add(plane)
 
-    // ── Partículas âmbar ──────────────────────────────────────────
+    // ── Partículas brancas/prata ──────────────────────────────────
     const pCount = 80
     const pPos = new Float32Array(pCount * 3)
     const pSpeeds = new Float32Array(pCount)
@@ -87,23 +83,30 @@ export default function HomeScene() {
     const pGeo = new THREE.BufferGeometry()
     pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3))
     const pMat = new THREE.PointsMaterial({
-      color: 0xf59e0b,
-      size: 0.02,
+      color: 0xc0c0c0,
+      size: 0.018,
       transparent: true,
-      opacity: 0.6,
+      opacity: 0.55,
       depthWrite: false,
     })
     scene.add(new THREE.Points(pGeo, pMat))
 
-    // ── Mouse parallax ────────────────────────────────────────────
+    // ── GSAP zoom: câmera z 2.5 → 1.8 em 3s ─────────────────────
+    const zoomTween = gsap.to(camera.position, {
+      z: 1.8,
+      duration: 3,
+      ease: 'power2.out',
+    })
+
+    // ── Mouse parallax ±8 graus ───────────────────────────────────
     let targetX = 0
     let targetY = 0
     let currentX = 0
     let currentY = 0
 
     function onMouseMove(e: MouseEvent) {
-      targetX = ((e.clientX / window.innerWidth) * 2 - 1) * 0.3
-      targetY = -((e.clientY / window.innerHeight) * 2 - 1) * 0.3
+      targetX = ((e.clientX / window.innerWidth) * 2 - 1) * 0.25
+      targetY = -((e.clientY / window.innerHeight) * 2 - 1) * 0.25
     }
     window.addEventListener('mousemove', onMouseMove)
 
@@ -113,14 +116,12 @@ export default function HomeScene() {
     function tick() {
       frameId = requestAnimationFrame(tick)
 
-      // Lerp suave da câmera seguindo o mouse
-      currentX += (targetX - currentX) * 0.05
-      currentY += (targetY - currentY) * 0.05
+      currentX += (targetX - currentX) * 0.04
+      currentY += (targetY - currentY) * 0.04
       camera.position.x = currentX
       camera.position.y = currentY
       camera.lookAt(0, 0, 0)
 
-      // Partículas flutuam para cima
       const pos = pGeo.attributes.position.array as Float32Array
       for (let i = 0; i < pCount; i++) {
         pos[i * 3 + 1] += pSpeeds[i]
@@ -143,6 +144,7 @@ export default function HomeScene() {
     window.addEventListener('resize', onResize)
 
     return () => {
+      zoomTween.kill()
       cancelAnimationFrame(frameId)
       window.removeEventListener('mousemove', onMouseMove)
       window.removeEventListener('resize', onResize)

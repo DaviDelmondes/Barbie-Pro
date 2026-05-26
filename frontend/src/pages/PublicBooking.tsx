@@ -8,6 +8,7 @@ import {
 import { supabase } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
 import type { Service, Profile } from '@/types'
+import barberPoleBg from '@/assets/barber-pole.jpeg'
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -145,9 +146,9 @@ function MonthCalendar({
                 fontWeight: 500,
                 cursor: past ? 'not-allowed' : 'pointer',
                 opacity: past ? 0.3 : 1,
-                backgroundColor: sel ? '#F59E0B' : 'transparent',
-                color: sel ? '#0a0a0a' : tod ? '#F59E0B' : '#e4e4e7',
-                border: tod && !sel ? '1px solid rgba(245,158,11,0.6)' : '1px solid transparent',
+                backgroundColor: sel ? '#FFFFFF' : 'transparent',
+                color: sel ? '#0a0a0a' : tod ? '#FFFFFF' : '#e4e4e7',
+                border: tod && !sel ? '1px solid rgba(255,255,255,0.4)' : '1px solid transparent',
                 transition: 'background-color 0.15s, color 0.15s',
               }}
             >
@@ -173,20 +174,20 @@ function Stepper({ step }: { step: number }) {
               className={cn(
                 'w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300',
                 step === i + 1
-                  ? 'bg-amber-500 text-zinc-950 shadow-lg shadow-amber-500/40'
+                  ? 'bg-white text-zinc-950 shadow-lg shadow-white/20'
                   : step > i + 1
-                  ? 'bg-amber-500/20 border border-amber-500/40'
+                  ? 'bg-white/10 border border-white/30'
                   : 'bg-white/5 border border-white/10 text-zinc-600',
               )}
             >
               {step > i + 1
-                ? <Check className="w-3.5 h-3.5 text-amber-400" />
+                ? <Check className="w-3.5 h-3.5 text-zinc-950" />
                 : <span className={step === i + 1 ? 'text-zinc-950' : ''}>{i + 1}</span>}
             </div>
             <span
               className={cn(
                 'text-[10px] hidden sm:block',
-                step === i + 1 ? 'text-amber-400' : step > i + 1 ? 'text-amber-500/60' : 'text-zinc-700',
+                step === i + 1 ? 'text-white' : step > i + 1 ? 'text-zinc-500' : 'text-zinc-700',
               )}
             >
               {label}
@@ -196,7 +197,7 @@ function Stepper({ step }: { step: number }) {
             <div
               className={cn(
                 'w-7 sm:w-10 h-px mx-1 mb-4 transition-colors duration-300',
-                step > i + 1 ? 'bg-amber-500/50' : 'bg-white/8',
+                step > i + 1 ? 'bg-white/30' : 'bg-white/8',
               )}
             />
           )}
@@ -283,10 +284,10 @@ export default function PublicBooking() {
     return (
       <div
         className="min-h-screen flex flex-col items-center justify-center px-5 text-center"
-        style={{ background: '#0a0a0a' }}
+        style={{ background: '#080808' }}
       >
-        <div className="w-20 h-20 rounded-full bg-amber-500/15 border-2 border-amber-500/60 flex items-center justify-center mb-6 shadow-2xl shadow-amber-500/20">
-          <CheckCircle className="w-10 h-10 text-amber-400" />
+        <div className="w-20 h-20 rounded-full bg-white/10 border-2 border-white/30 flex items-center justify-center mb-6 shadow-2xl shadow-white/10">
+          <CheckCircle className="w-10 h-10 text-white" />
         </div>
 
         <h1 className="text-2xl font-bold text-white mb-2">Agendamento Confirmado!</h1>
@@ -311,13 +312,13 @@ export default function PublicBooking() {
           ))}
           <div className="flex justify-between items-center pt-3">
             <span className="text-zinc-400 font-medium text-sm">Valor</span>
-            <span className="text-amber-400 font-bold text-xl">R$ {service?.price}</span>
+            <span className="text-white font-bold text-xl">R$ {service?.price}</span>
           </div>
         </div>
 
         <button
           onClick={() => navigate('/')}
-          className="px-8 py-3 rounded-xl bg-amber-500 text-zinc-950 font-bold text-sm hover:bg-amber-400 transition-colors shadow-lg shadow-amber-500/25"
+          className="px-8 py-3 rounded-xl bg-white text-zinc-950 font-bold text-sm hover:bg-zinc-100 transition-colors shadow-lg shadow-white/15"
         >
           Voltar ao início
         </button>
@@ -328,20 +329,34 @@ export default function PublicBooking() {
   // ── Render principal ──────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#0a0a0a' }}>
+    <div className="min-h-screen flex flex-col" style={{ background: '#080808' }}>
+
+      {/* Barber-pole background */}
+      <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+        <div style={{
+          position: 'absolute',
+          inset: -16,
+          backgroundImage: `url(${barberPoleBg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: 0.06,
+          filter: 'blur(8px)',
+        }} />
+      </div>
+
       {/* Header */}
       <header
-        className="shrink-0 flex items-center justify-center gap-2.5 py-4 border-b border-white/5"
-        style={{ background: 'rgba(10,10,10,0.9)', backdropFilter: 'blur(20px)' }}
+        className="shrink-0 flex items-center justify-center gap-2.5 py-4 border-b border-white/5 relative"
+        style={{ background: 'rgba(8,8,8,0.9)', backdropFilter: 'blur(20px)', zIndex: 1 }}
       >
-        <div className="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
-          <Scissors className="w-4 h-4 text-zinc-950" />
+        <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+          <Scissors className="w-4 h-4 text-white" />
         </div>
         <span className="font-bold text-white tracking-tight">Barbie Pro</span>
       </header>
 
       {/* Conteúdo */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto relative" style={{ zIndex: 1 }}>
         <div className="max-w-md mx-auto px-4 pt-7 pb-32">
           <Stepper step={step} />
 
@@ -366,7 +381,7 @@ export default function PublicBooking() {
                       className={cn(
                         'w-full flex items-center justify-between p-4 rounded-2xl border text-left transition-all active:scale-[0.98]',
                         service?.id === s.id
-                          ? 'border-amber-500 bg-amber-500/10 shadow-lg shadow-amber-500/10'
+                          ? 'border-white bg-white/10 shadow-lg shadow-white/10'
                           : 'border-white/8 bg-white/3 hover:border-white/18 hover:bg-white/5',
                       )}
                     >
@@ -381,10 +396,10 @@ export default function PublicBooking() {
                         </div>
                       </div>
                       <div className="flex items-center gap-3 shrink-0 ml-4">
-                        <span className="text-amber-400 font-bold text-lg">R$ {s.price}</span>
+                        <span className="text-white font-bold text-lg">R$ {s.price}</span>
                         <div className={cn(
                           'w-5 h-5 rounded-full border flex items-center justify-center transition-all',
-                          service?.id === s.id ? 'bg-amber-500 border-amber-500' : 'border-white/20',
+                          service?.id === s.id ? 'bg-white border-white' : 'border-white/20',
                         )}>
                           {service?.id === s.id && <Check className="w-3 h-3 text-zinc-950" />}
                         </div>
@@ -435,7 +450,7 @@ export default function PublicBooking() {
                       className={cn(
                         'w-full flex items-center gap-4 p-4 rounded-2xl border text-left transition-all active:scale-[0.98]',
                         barber?.id === b.id
-                          ? 'border-amber-500 bg-amber-500/10 shadow-lg shadow-amber-500/10'
+                          ? 'border-white bg-white/10 shadow-lg shadow-white/10'
                           : 'border-white/8 bg-white/3 hover:border-white/18 hover:bg-white/5',
                       )}
                     >
@@ -452,7 +467,7 @@ export default function PublicBooking() {
                       </div>
                       <div className={cn(
                         'w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-all',
-                        barber?.id === b.id ? 'bg-amber-500 border-amber-500' : 'border-white/20',
+                        barber?.id === b.id ? 'bg-white border-white' : 'border-white/20',
                       )}>
                         {barber?.id === b.id && <Check className="w-3 h-3 text-zinc-950" />}
                       </div>
@@ -493,8 +508,8 @@ export default function PublicBooking() {
                         style={{
                           padding: '14px 0',
                           borderRadius: 12,
-                          border: time === slot ? '1px solid #F59E0B' : '1px solid rgba(255,255,255,0.1)',
-                          backgroundColor: time === slot ? '#F59E0B' : 'rgba(255,255,255,0.03)',
+                          border: time === slot ? '1px solid #FFFFFF' : '1px solid rgba(255,255,255,0.1)',
+                          backgroundColor: time === slot ? '#FFFFFF' : 'rgba(255,255,255,0.03)',
                           color: time === slot ? '#0a0a0a' : '#e4e4e7',
                           fontSize: 14,
                           fontWeight: 600,
@@ -535,7 +550,7 @@ export default function PublicBooking() {
                 ))}
                 <div className="flex justify-between items-center pt-3">
                   <span className="text-zinc-400 font-medium text-sm">Total</span>
-                  <span className="text-amber-400 font-bold text-xl">R$ {service?.price}</span>
+                  <span className="text-white font-bold text-xl">R$ {service?.price}</span>
                 </div>
               </div>
 
@@ -548,7 +563,7 @@ export default function PublicBooking() {
                     onChange={e => setClientName(e.target.value)}
                     placeholder="Seu nome completo"
                     autoComplete="name"
-                    className="w-full pl-11 pr-4 py-4 rounded-xl border border-white/10 bg-white/3 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-amber-500/60 transition-colors"
+                    className="w-full pl-11 pr-4 py-4 rounded-xl border border-white/10 bg-white/3 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-white/50 transition-colors"
                   />
                 </div>
                 <div className="relative">
@@ -560,7 +575,7 @@ export default function PublicBooking() {
                     type="tel"
                     autoComplete="tel"
                     inputMode="tel"
-                    className="w-full pl-11 pr-4 py-4 rounded-xl border border-white/10 bg-white/3 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-amber-500/60 transition-colors"
+                    className="w-full pl-11 pr-4 py-4 rounded-xl border border-white/10 bg-white/3 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-white/50 transition-colors"
                   />
                 </div>
               </div>
@@ -577,7 +592,7 @@ export default function PublicBooking() {
                 className={cn(
                   'w-full py-4 rounded-xl font-bold text-base transition-all active:scale-[0.98]',
                   canProceed() && !confirmMut.isPending
-                    ? 'bg-amber-500 text-zinc-950 hover:bg-amber-400 shadow-xl shadow-amber-500/25'
+                    ? 'bg-white text-zinc-950 hover:bg-zinc-100 shadow-xl shadow-white/15'
                     : 'bg-white/5 text-zinc-600 cursor-not-allowed',
                 )}
               >
@@ -592,7 +607,7 @@ export default function PublicBooking() {
       {step < 4 && (
         <div
           className="fixed bottom-0 left-0 right-0 px-4 py-4 border-t border-white/5"
-          style={{ background: 'rgba(10,10,10,0.95)', backdropFilter: 'blur(20px)', zIndex: 10 }}
+          style={{ background: 'rgba(8,8,8,0.95)', backdropFilter: 'blur(20px)', zIndex: 10 }}
         >
           <div className="max-w-md mx-auto flex items-center justify-between gap-4">
             <button
@@ -614,7 +629,7 @@ export default function PublicBooking() {
               className={cn(
                 'flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all active:scale-[0.97]',
                 canProceed()
-                  ? 'bg-amber-500 text-zinc-950 hover:bg-amber-400 shadow-xl shadow-amber-500/25'
+                  ? 'bg-white text-zinc-950 hover:bg-zinc-100 shadow-xl shadow-white/15'
                   : 'bg-white/5 text-zinc-600 cursor-not-allowed',
               )}
             >

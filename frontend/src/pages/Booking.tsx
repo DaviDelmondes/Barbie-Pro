@@ -16,7 +16,7 @@ const STATUS_LABELS: Record<AppointmentStatus, string> = {
 }
 
 const STATUS_STYLES: Record<AppointmentStatus, string> = {
-  pending: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+  pending: 'bg-white/10 text-zinc-200 border-white/20',
   confirmed: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
   done: 'bg-green-500/15 text-green-400 border-green-500/30',
   cancelled: 'bg-zinc-700/50 text-zinc-500 border-zinc-700',
@@ -101,7 +101,7 @@ export default function Booking() {
             className={cn(
               'px-4 py-1.5 rounded-lg text-sm font-medium border transition-all',
               filter === tab.key
-                ? 'bg-amber-500 text-zinc-950 border-amber-500'
+                ? 'bg-white text-zinc-950 border-white'
                 : 'border-white/8 text-zinc-400 hover:text-white hover:bg-white/5',
             )}
           >
@@ -125,7 +125,7 @@ export default function Booking() {
       {/* Loading */}
       {isLoading && (
         <div className="flex justify-center py-20">
-          <div className="w-7 h-7 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-7 h-7 border-2 border-white border-t-transparent rounded-full animate-spin" />
         </div>
       )}
 
@@ -153,7 +153,7 @@ export default function Booking() {
                 style={{ background: 'rgba(255,255,255,0.03)' }}
               >
                 {/* Avatar */}
-                <div className="w-10 h-10 rounded-full bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-sm shrink-0">
+                <div className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white font-bold text-sm shrink-0">
                   {initials}
                 </div>
 
@@ -180,7 +180,7 @@ export default function Booking() {
                       {time}
                     </span>
                     {apt.service?.price != null && (
-                      <span className="text-xs font-semibold text-amber-400">
+                      <span className="text-xs font-semibold text-zinc-200">
                         R$ {apt.service.price}
                       </span>
                     )}

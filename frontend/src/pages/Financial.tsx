@@ -99,7 +99,7 @@ export default function Financial() {
               onClick={() => setPeriod(p)}
               className={cn(
                 'px-4 py-1.5 rounded-md text-sm font-medium transition-all',
-                period === p ? 'bg-amber-500 text-zinc-950' : 'text-zinc-400 hover:text-white',
+                period === p ? 'bg-white text-zinc-950' : 'text-zinc-400 hover:text-white',
               )}
             >
               {p}
@@ -139,7 +139,7 @@ export default function Financial() {
                 icon={DollarSign}
                 label="Ticket Médio"
                 value={`R$ ${stats.avgTicket.toLocaleString('pt-BR')}`}
-                accent="bg-amber-500/20 text-amber-400"
+                accent="bg-white/10 text-zinc-300"
               />
             </div>
           </>
@@ -159,7 +159,7 @@ export default function Financial() {
 
         {isLoading && (
           <div className="flex justify-center py-10">
-            <div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
           </div>
         )}
 
