@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import gsap from 'gsap'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -230,6 +231,19 @@ export default function PublicBooking() {
 
   const [step, setStep] = useState<Step>(1)
   const [success, setSuccess] = useState(false)
+  const stepRef = useRef<HTMLDivElement>(null)
+
+  // Stagger nos cards ao trocar de etapa
+  useEffect(() => {
+    if (!stepRef.current) return
+    const cards = stepRef.current.querySelectorAll('[data-card]')
+    if (cards.length) {
+      gsap.fromTo(cards,
+        { y: 16, opacity: 0 },
+        { y: 0, opacity: 1, stagger: 0.07, duration: 0.45, ease: 'power3.out', clearProps: 'all' },
+      )
+    }
+  }, [step])
 
   const [service, setService] = useState<Service | null>(null)
   const [barber, setBarber] = useState<Profile | null>(null)
@@ -343,12 +357,13 @@ export default function PublicBooking() {
       <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
         <div style={{
           position: 'absolute',
-          inset: -16,
+          inset: -24,
           backgroundImage: `url(${barberPoleBg})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          opacity: 0.06,
-          filter: 'blur(8px)',
+          opacity: 0.1,
+          filter: 'blur(6px)',
+          transform: 'scale(1.05)',
         }} />
       </div>
 
@@ -368,6 +383,8 @@ export default function PublicBooking() {
         <div className="max-w-md mx-auto px-4 pt-7 pb-32">
           <Stepper step={step} />
 
+          <div ref={stepRef}>
+
           {/* ── Etapa 1: Serviço ────────────────────────────────────────────── */}
           {step === 1 && (
             <div>
@@ -385,7 +402,11 @@ export default function PublicBooking() {
                   {servicesQ.data.map(s => (
                     <button
                       key={s.id}
-                      onClick={() => setService(s)}
+                      data-card
+                      onClick={(e) => {
+                        setService(s)
+                        gsap.fromTo(e.currentTarget, { scale: 0.98 }, { scale: 1, duration: 0.3, ease: 'back.out(3)' })
+                      }}
                       className={cn(
                         'w-full flex items-center justify-between p-4 rounded-2xl border text-left transition-all active:scale-[0.98]',
                         service?.id === s.id
@@ -454,7 +475,11 @@ export default function PublicBooking() {
                   {barbersQ.data.map(b => (
                     <button
                       key={b.id}
-                      onClick={() => { setBarber(b); setDate(null); setTime(null) }}
+                      data-card
+                      onClick={(e) => {
+                        setBarber(b); setDate(null); setTime(null)
+                        gsap.fromTo(e.currentTarget, { scale: 0.98 }, { scale: 1, duration: 0.3, ease: 'back.out(3)' })
+                      }}
                       className={cn(
                         'w-full flex items-center gap-4 p-4 rounded-2xl border text-left transition-all active:scale-[0.98]',
                         barber?.id === b.id
@@ -608,6 +633,8 @@ export default function PublicBooking() {
               </button>
             </div>
           )}
+
+          </div>{/* /stepRef */}
         </div>
       </div>
 

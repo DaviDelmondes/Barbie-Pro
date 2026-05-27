@@ -31,19 +31,35 @@ export default function Home() {
         { scaleX: 1, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 0.4, transformOrigin: 'left center' },
       )
 
-      // SplitText — letras entram uma a uma (sincronizado com zoom da câmera)
+      // Letras entram com blur 10px → 0px (efeito cinematográfico)
       const chars = sectionRef.current!.querySelectorAll('.split-char')
       gsap.fromTo(
         chars,
-        { y: 40, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.9, stagger: 0.04, ease: 'power3.out', delay: 0.55 },
+        { y: 60, opacity: 0, filter: 'blur(10px)' },
+        { y: 0, opacity: 1, filter: 'blur(0px)', duration: 1.0, stagger: 0.05, ease: 'power3.out', delay: 0.5 },
       )
 
-      // Subtítulo e botão entram depois
-      gsap.fromTo(
-        [subtitleRef.current, btnRef.current],
+      // Subtítulo entra depois
+      gsap.fromTo(subtitleRef.current,
         { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.85, stagger: 0.18, ease: 'power3.out', delay: 1.15 },
+        { y: 0, opacity: 1, duration: 0.85, ease: 'power3.out', delay: 1.3 },
+      )
+
+      // Botão entra e depois pulsa suavemente em loop
+      gsap.fromTo(btnRef.current,
+        { y: 20, opacity: 0 },
+        {
+          y: 0, opacity: 1, duration: 0.85, ease: 'power3.out', delay: 1.5,
+          onComplete: () => {
+            gsap.to(btnRef.current, {
+              scale: 1.03,
+              duration: 1.6,
+              ease: 'sine.inOut',
+              yoyo: true,
+              repeat: -1,
+            })
+          },
+        },
       )
     }, sectionRef)
 
@@ -55,28 +71,26 @@ export default function Home() {
       ref={sectionRef}
       style={{ height: '100vh', position: 'relative', overflow: 'hidden', background: '#080808' }}
     >
-      {/* Three.js — PlaneGeometry + shader de profundidade + parallax mouse */}
+      {/* Three.js — câmera imersiva + parallax + zoom no scroll */}
       <HomeScene />
 
-      {/* Gradiente: #000 (baixo) → transparent (topo) */}
+      {/* Gradiente de profundidade */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
-          background:
-            'linear-gradient(to top, #000000 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.3) 100%)',
+          background: 'linear-gradient(to top, #000 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.25) 100%)',
           pointerEvents: 'none',
           zIndex: 1,
         }}
       />
 
-      {/* Vinheta inset nas bordas */}
+      {/* Vinheta nas 4 bordas */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
-          boxShadow:
-            'inset 0 0 200px rgba(0,0,0,0.9), inset 0 0 80px rgba(0,0,0,0.5)',
+          boxShadow: 'inset 0 0 220px rgba(0,0,0,0.95), inset 0 0 80px rgba(0,0,0,0.5)',
           pointerEvents: 'none',
           zIndex: 1,
         }}
@@ -99,10 +113,12 @@ export default function Home() {
             width: 36,
             height: 36,
             borderRadius: 8,
-            background: 'rgba(255,255,255,0.12)',
+            background: 'rgba(255,255,255,0.1)',
+            border: '1px solid rgba(255,255,255,0.12)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            backdropFilter: 'blur(10px)',
           }}
         >
           <Scissors size={18} color="#ffffff" />
@@ -144,7 +160,7 @@ export default function Home() {
             color: '#ffffff',
             letterSpacing: '-0.03em',
             lineHeight: 1,
-            marginBottom: 18,
+            marginBottom: 20,
             fontFamily: 'system-ui, -apple-system, sans-serif',
           }}
         >
@@ -155,11 +171,12 @@ export default function Home() {
           ref={subtitleRef}
           style={{
             fontSize: 'clamp(11px, 1.3vw, 15px)',
-            color: 'rgba(255,255,255,0.5)',
-            marginBottom: 34,
+            color: 'rgba(255,255,255,0.45)',
+            marginBottom: 36,
             letterSpacing: '0.24em',
             textTransform: 'uppercase',
             opacity: 0,
+            fontWeight: 300,
           }}
         >
           Barbearia de Alto Padrão &nbsp;·&nbsp; Agende Seu Horário
@@ -171,28 +188,22 @@ export default function Home() {
           style={{
             display: 'inline-flex',
             alignItems: 'center',
-            padding: '13px 32px',
+            padding: '14px 36px',
             background: '#FFFFFF',
-            color: '#0a0a0a',
+            color: '#080808',
             fontWeight: 700,
             fontSize: 15,
-            borderRadius: 12,
+            borderRadius: 14,
             border: 'none',
-            cursor: 'pointer',
             letterSpacing: '0.02em',
-            boxShadow: '0 0 40px rgba(255,255,255,0.15), 0 6px 24px rgba(0,0,0,0.5)',
+            boxShadow: '0 0 40px rgba(255,255,255,0.18), 0 8px 28px rgba(0,0,0,0.6)',
             opacity: 0,
-            transition: 'transform 0.22s ease, box-shadow 0.22s ease',
           }}
           onMouseEnter={e => {
-            const el = e.currentTarget
-            el.style.transform = 'scale(1.05)'
-            el.style.boxShadow = '0 0 60px rgba(255,255,255,0.25), 0 6px 28px rgba(0,0,0,0.5)'
+            e.currentTarget.style.boxShadow = '0 0 60px rgba(255,255,255,0.3), 0 8px 32px rgba(0,0,0,0.6)'
           }}
           onMouseLeave={e => {
-            const el = e.currentTarget
-            el.style.transform = 'scale(1)'
-            el.style.boxShadow = '0 0 40px rgba(255,255,255,0.15), 0 6px 24px rgba(0,0,0,0.5)'
+            e.currentTarget.style.boxShadow = '0 0 40px rgba(255,255,255,0.18), 0 8px 28px rgba(0,0,0,0.6)'
           }}
         >
           Agendar Agora

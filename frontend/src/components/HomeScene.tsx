@@ -19,22 +19,22 @@ export default function HomeScene() {
     renderer.setClearColor(0x080808)
     mount.appendChild(renderer.domElement)
 
-    // ── Câmera — começa em z=2.5, GSAP anima até z=1.8 ──────────
+    // ── Câmera ── começa em z=2.5, zoom cinematic para z=1.8 ─────
     const fov = 60
     const camera = new THREE.PerspectiveCamera(fov, aspect, 0.1, 100)
     camera.position.z = 2.5
 
-    // ── Plano dimensionado para cobrir a tela no pior caso (z=2.5)
+    // ── Plano dimensionado para cobrir a tela em z=2.5 ────────────
     const dist = 2.5
     const visH = 2 * Math.tan((fov * Math.PI / 180) / 2) * dist
     const visW = visH * aspect
-    const planeW = visW * 1.35
-    const planeH = visH * 1.35
+    const planeW = visW * 1.4
+    const planeH = visH * 1.4
 
     // ── Cena ──────────────────────────────────────────────────────
     const scene = new THREE.Scene()
 
-    // ── Textura barber-pole ───────────────────────────────────────
+    // ── Textura barber-pole (cover-fit) ──────────────────────────
     const texture = new THREE.Texture()
     texture.minFilter = THREE.LinearFilter
     texture.magFilter = THREE.LinearFilter
@@ -69,44 +69,53 @@ export default function HomeScene() {
     scene.add(plane)
 
     // ── Partículas brancas/prata ──────────────────────────────────
-    const pCount = 80
+    const pCount = 100
     const pPos = new Float32Array(pCount * 3)
     const pSpeeds = new Float32Array(pCount)
 
     for (let i = 0; i < pCount; i++) {
       pPos[i * 3 + 0] = (Math.random() - 0.5) * planeW
       pPos[i * 3 + 1] = (Math.random() - 0.5) * planeH
-      pPos[i * 3 + 2] = 0.05 + Math.random() * 0.3
-      pSpeeds[i] = 0.002 + Math.random() * 0.003
+      pPos[i * 3 + 2] = 0.05 + Math.random() * 0.35
+      pSpeeds[i] = 0.0015 + Math.random() * 0.0025
     }
 
     const pGeo = new THREE.BufferGeometry()
     pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3))
     const pMat = new THREE.PointsMaterial({
-      color: 0xc0c0c0,
-      size: 0.018,
+      color: 0xc8c8c8,
+      size: 0.014,
       transparent: true,
-      opacity: 0.55,
+      opacity: 0.5,
       depthWrite: false,
     })
     scene.add(new THREE.Points(pGeo, pMat))
 
-    // ── GSAP zoom: câmera z 2.5 → 1.8 em 3s ─────────────────────
+    // ── GSAP zoom cinematic ───────────────────────────────────────
+    let wheelEnabled = false
     const zoomTween = gsap.to(camera.position, {
       z: 1.8,
       duration: 3,
       ease: 'power2.out',
+      onComplete: () => { wheelEnabled = true },
     })
 
-    // ── Mouse parallax ±8 graus ───────────────────────────────────
+    // ── Wheel scroll → avança câmera em direção ao poste ─────────
+    function onWheel(e: WheelEvent) {
+      if (!wheelEnabled) return
+      camera.position.z = Math.max(1.0, Math.min(2.5, camera.position.z + e.deltaY * 0.001))
+    }
+    window.addEventListener('wheel', onWheel, { passive: true })
+
+    // ── Mouse parallax ±15° ───────────────────────────────────────
     let targetX = 0
     let targetY = 0
     let currentX = 0
     let currentY = 0
 
     function onMouseMove(e: MouseEvent) {
-      targetX = ((e.clientX / window.innerWidth) * 2 - 1) * 0.25
-      targetY = -((e.clientY / window.innerHeight) * 2 - 1) * 0.25
+      targetX = ((e.clientX / window.innerWidth) * 2 - 1) * 0.45
+      targetY = -((e.clientY / window.innerHeight) * 2 - 1) * 0.45
     }
     window.addEventListener('mousemove', onMouseMove)
 
@@ -147,6 +156,7 @@ export default function HomeScene() {
       zoomTween.kill()
       cancelAnimationFrame(frameId)
       window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('wheel', onWheel)
       window.removeEventListener('resize', onResize)
       planeGeo.dispose()
       planeMat.dispose()

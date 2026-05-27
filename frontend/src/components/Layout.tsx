@@ -44,10 +44,10 @@ function NavItem({ to, icon: Icon, label, onNavigate }: {
       onClick={onNavigate}
       className={({ isActive }) =>
         cn(
-          'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+          'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all',
           isActive
-            ? 'bg-white/10 text-white border border-white/20'
-            : 'text-zinc-400 hover:text-white hover:bg-white/5 border border-transparent',
+            ? 'bg-white text-zinc-950 border border-white/10 shadow-sm'
+            : 'text-white/50 hover:text-white hover:bg-white/5 border border-transparent',
         )
       }
     >
@@ -83,12 +83,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
         <div style={{
           position: 'absolute',
-          inset: -16,
+          inset: -24,
           backgroundImage: `url(${barberPoleBg})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          opacity: 0.04,
-          filter: 'blur(8px)',
+          opacity: 0.08,
+          filter: 'blur(4px)',
+          transform: 'scale(1.1)',
         }} />
       </div>
 
@@ -131,7 +132,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           'fixed left-0 top-0 h-screen w-64 flex flex-col border-r border-white/5 transition-transform duration-300',
           isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         )}
-        style={{ zIndex: 30, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(20px)' }}
+        style={{ zIndex: 30, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(40px)', borderRight: '1px solid rgba(255,255,255,0.06)' }}
       >
         {/* Fechar (mobile) */}
         <button
